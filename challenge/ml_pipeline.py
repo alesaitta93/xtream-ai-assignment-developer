@@ -12,6 +12,47 @@ from functools import partial
 OUT_DIR = os.path.join(os.getcwd(), "models")
 MODEL_INDEX_FILENAME = "models.csv"
 
+# Model indipendent utilities
+
+def train_n_evaluate_model(model, x_train, x_test, y_train, y_test):
+
+    model.fit(x_train, y_train)
+    pred = model.predict(x_test)
+    r2 = r2_score(y_test, pred)
+    mae = mean_absolute_error(y_test, pred)
+
+    return model, r2, mae
+
+def save_model(model, r2, mae, csv_model_index_filename=MODEL_INDEX_FILENAME, out_dir=OUT_DIR):
+
+    model_name = "{}_{}".format(type(model).__name__, datetime.now().strftime("%m_%d_%Y__%H_%M_%S"))
+    new_row_data = [{
+        "model_name": model_name,
+        "r2": r2,
+        "mae": mae
+    }]
+
+    # output directory verification
+    if not os.path.isdir(out_dir):
+        os.mkdir(out_dir)
+
+    # model pickle save
+    model_file_name = "{}.pkl".format(model_name)
+    model_file_path = os.path.join(out_dir, model_file_name)
+    pickle.dump(model, open(model_file_path, "wb"))
+
+    # csv index update
+    new_row_df = pd.DataFrame(data=new_row_data)
+    model_index_path = os.path.join(out_dir, csv_model_index_filename)
+    if os.path.isfile(model_index_path):
+        model_df = pd.read_csv(model_index_path)
+        out_df = pd.concat([model_df, new_row_df])
+    else:
+        out_df = new_row_df
+
+    out_df.to_csv(model_index_path)
+
+# Linear regression utilities
 
 def data_preparation_for_linear_regression(path, test_size=0.2, random_state=42):
 
@@ -26,6 +67,18 @@ def data_preparation_for_linear_regression(path, test_size=0.2, random_state=42)
 
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=random_state)
     return x_train, x_test, y_train, y_test
+
+
+def train_n_evaluate_linear_model(path):
+    x_train, x_test, y_train, y_test = data_preparation_for_linear_regression(path)
+    return train_n_evaluate_model(LinearRegression(), x_train, x_test, y_train, y_test)
+
+
+def train_n_save_linear_model(path):
+    model, r2, mae = train_n_evaluate_linear_model(path)
+    save_model(model, r2, mae)
+
+# xgboost utilities
 
 def data_preparation_for_xgb(path, test_size=0.2, random_state=42):
     diamonds = pd.read_csv(path)
@@ -42,23 +95,8 @@ def data_preparation_for_xgb(path, test_size=0.2, random_state=42):
                                                                         diamonds_processed_xgb['price'],
                                                                         test_size=test_size,
                                                                         random_state=random_state)
-    x_train_xbg, x_test_xbg, y_train_xbg, y_test_xbg = train_test_split(diamonds_processed_xgb.drop(columns='price'),
-                                                                        diamonds_processed_xgb['price'], test_size=0.2,
-                                                                        random_state=42)
+    return x_train_xbg, x_test_xbg, y_train_xbg, y_test_xbg
 
-
-def train_n_evaluate_model(model, x_train, x_test, y_train, y_test):
-
-    model.fit(x_train, y_train)
-    pred = model.predict(x_test)
-    r2 = r2_score(y_test, pred)
-    mae = mean_absolute_error(y_test, pred)
-
-    return model, r2, mae
-
-
-def train_n_evaluate_linear_model(x_train, x_test, y_train, y_test):
-    return train_n_evaluate_model(LinearRegression(), x_train, x_test, y_train, y_test)
 
 def objective(x_train_xbg, y_train_xbg, trial: optuna.trial.Trial) -> float:
     # Define hyperparameters to tune
@@ -97,37 +135,14 @@ def optimize_xgboost_params(x_train_xgb, y_train_xgb):
     return study.best_params
 
 
-def optimize_train_n_evaluate()
+def optimize_train_n_evaluate_xgboost(path):
+    x_train_xbg, x_test_xbg, y_train_xbg, y_test_xbg = data_preparation_for_xgb(path)
+    params = optimize_xgboost_params(x_train_xbg, y_train_xbg)
+    model = xgboost.XGBRegressor(**params, enable_categorical=True, random_state=42)
+    return train_n_evaluate_model(model, x_train_xbg, x_test_xbg, y_train_xbg, y_test_xbg)
 
-
-
-def save_model(model, r2, mae, csv_model_index_filename=MODEL_INDEX_FILENAME, out_dir=OUT_DIR):
-
-    model_name = "{}_{}".format(type(model).__name__, datetime.now().strftime("%m_%d_%Y__%H_%M_%S"))
-    new_row_data = [{
-        "model_name": model_name,
-        "r2": r2,
-        "mae": mae
-    }]
-
-    # output directory verification
-    if not os.path.isdir(out_dir):
-        os.mkdir(out_dir)
-
-    # model pickle save
-    model_file_name = "{}.pkl".format(model_name)
-    model_file_path = os.path.join(out_dir, model_file_name)
-    pickle.dump(model, open(model_file_path, "wb"))
-
-    # csv index update
-    new_row_df = pd.DataFrame(data=new_row_data)
-    model_index_path = os.path.join(out_dir, csv_model_index_filename)
-    if os.path.isfile(model_index_path):
-        model_df = pd.read_csv(model_index_path)
-        out_df = pd.concat([model_df, new_row_df])
-    else:
-        out_df = new_row_df
-
-    out_df.to_csv(model_index_path)
+def train_n_save_xgb_model(path):
+    model, r2, mae = optimize_train_n_evaluate_xgboost(path)
+    save_model(model, r2, mae)
 
 
