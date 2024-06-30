@@ -43,9 +43,12 @@ def save_model(model, r2, mae, csv_model_index_filename=MODEL_INDEX_FILENAME, ou
 
     # csv index update
     new_row_df = pd.DataFrame(data=new_row_data)
+    new_row_df.reset_index(drop=True, inplace=True)
+    new_row_df.set_index(["model_name"], inplace=True)
     model_index_path = os.path.join(out_dir, csv_model_index_filename)
     if os.path.isfile(model_index_path):
-        model_df = pd.read_csv(model_index_path)
+        model_df = pd.read_csv(model_index_path).reset_index(drop=True)
+        model_df.set_index(["model_name"], inplace=True)
         out_df = pd.concat([model_df, new_row_df])
     else:
         out_df = new_row_df
