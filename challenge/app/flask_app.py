@@ -1,5 +1,5 @@
 from flask import Flask, request
-from challenge.pipeline.prediction_utilities import predict_with_minimum_mae_model
+from challenge.pipeline.prediction_utilities import predict_with_minimum_mae_model, calculate_n_most_similar_diamonds
 
 app = Flask("Diamond APP")
 
@@ -33,21 +33,21 @@ def predict():
     }
     return predict_with_minimum_mae_model(params)
 
-@app.get("/api/neighborhood/")
-def neighborhood():
+# /api/similarities?n=3&cut=Premium&color=E&clarity=SI1&x=0.25
+@app.get("/api/similarities/")
+def similarities():
+    n = request.args.get('n')
     cut = request.args.get('cut')
     color = request.args.get('color')
     clarity = request.args.get('clarity')
     x = request.args.get('x')
 
-    params = {
+    cat_data = {
         'cut': cut,
         'color': color,
         'clarity': clarity,
-        'x': x,
     }
-    return params
-
+    return calculate_n_most_similar_diamonds(n, x, cat_data)
 
 
 if __name__ == '__main__':
