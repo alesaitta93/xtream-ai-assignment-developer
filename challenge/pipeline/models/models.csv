@@ -1,0 +1,3 @@
+model_name,r2,mae,dataset_path
+LinearRegression_07_02_2024__23_54_15,0.908999020699579,747.5296810118607,https://raw.githubusercontent.com/xtreamsrl/xtream-ai-assignment-engineer/main/datasets/diamonds/diamonds.csv
+XGBRegressor_07_02_2024__23_55_01,0.95272296667099,404.0934390869141,https://raw.githubusercontent.com/xtreamsrl/xtream-ai-assignment-engineer/main/datasets/diamonds/diamonds.csv

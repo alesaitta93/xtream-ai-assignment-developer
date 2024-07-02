@@ -1,4 +1,4 @@
-from challenge.ml_pipeline import train_n_save_linear_model, train_n_save_xgb_model
+from challenge.pipeline.training_pipeline import train_n_save_linear_model, train_n_save_xgb_model
 
 CSV_PATH =\
     "https://raw.githubusercontent.com/xtreamsrl/xtream-ai-assignment-engineer/main/datasets/diamonds/diamonds.csv"
