@@ -51,7 +51,7 @@ def calculate_n_most_similar_diamonds(n, carat, categorical_data):
     filtered_df["distance"] = distances
     sorted_df = filtered_df.sort_values(by='distance')
     sorted_df.drop(columns=['distance'], inplace=True)
-    sorted_json_str = sorted_df.head(n=int(n)).to_json(orient='records')
-    return sorted_json_str
+    sorted_dict = sorted_df.head(n=int(n)).to_dict(orient='records')
+    return sorted_dict
 
 

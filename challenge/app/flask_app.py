@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask, request, render_template, jsonify
 from challenge.pipeline.prediction_utilities import predict_with_minimum_mae_model, calculate_n_most_similar_diamonds
 
