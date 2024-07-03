@@ -2,7 +2,6 @@ import os
 import json
 import pandas as pd
 import pickle
-from sklearn.neighbors import NearestNeighbors
 from challenge.pipeline.training_pipeline import OUT_DIR
 
 def choose_model_from_df(path):
@@ -35,7 +34,7 @@ def predict_with_minimum_mae_model(data):
         prediction = model.predict(x)
     return str(prediction[0])
 
-def calculate_n_most_similar_diamonds(n, x, categorical_data):
+def calculate_n_most_similar_diamonds(n, carat, categorical_data):
     min_mae_row = choose_model_from_df(os.path.join(OUT_DIR, "models.csv"))
     training_set_path = min_mae_row["dataset_path"]
     training_df = pd.read_csv(training_set_path)
@@ -47,8 +46,9 @@ def calculate_n_most_similar_diamonds(n, x, categorical_data):
     # DF filtering using the concatenated conditions
     filtered_df = training_df[condition]
     # DF sorting following distances from input x value
-    x_converted = float(x)
-    filtered_df['distance'] = abs(filtered_df['x'] - x_converted)
+    carat_converted = float(carat)
+    distances = abs(filtered_df['carat'] - carat_converted).to_list()
+    filtered_df["distance"] = distances
     sorted_df = filtered_df.sort_values(by='distance')
     sorted_df.drop(columns=['distance'], inplace=True)
     sorted_json_str = sorted_df.head(n=int(n)).to_json(orient='records')
