@@ -68,4 +68,11 @@ Observability is key. Save every request and response made to the APIs to a **pr
 ---
 
 ## How to run
-Please fill this section as part of the assignment.
+
+### Challenge 1-2
+Run the Python file main.py located in the /challenge/pipeline folder. Two models will be generated and evaluated using the CSV specified at the path entered in the global variable CSV_PATH declared in main.py. The models are saved in the /challenge/pipeline/models folder and named according to the algorithm used and the timestamp of the training date. In the same folder, there will be a CSV file that reports the models' information and performance.
+
+### Challenge 3
+Run the Python file flask_app.py located in the /challenge/app folder. The console will display the URL where a simple HTML page will be accessible. By filling out two forms on this page, you can either predict the value of a diamond or obtain data on a number of similar diamonds (specified by the user) present in the training set. The selected prediction model is the one with the lowest MAE (Mean Absolute Error) score, according to the file /challenge/pipeline/models/models.csv.
+
+A reduced version of the app is also accessible at http://alelily93.eu.pythonanywhere.com/. This version is considered reduced because only linear regression models could be used on PythonAnywhere. Some functionalities of the project are not compatible with the version of XGBoost installed on the hosting platform.
