@@ -9,7 +9,6 @@ address = "mysql://{usr}:{psw}@{url}:{port}/{name}".format(
     port=config.database_info.port,
     name=config.database_info.name
 )
-print(address)
 engine = create_engine(address)
 
 Base = declarative_base()

@@ -1,8 +1,12 @@
 from flask import Flask, request, render_template, jsonify
 from challenge.pipeline.prediction_utilities import predict_with_minimum_mae_model, calculate_n_most_similar_diamonds
 from copy import deepcopy
-from challenge.app.database.database_utilities import create_element, LogPredictions, LogSimilarities
 import json
+try:
+    from challenge.app.database.database_utilities import create_element, LogPredictions, LogSimilarities
+except:
+    print("No DB detected")
+
 
 app = Flask("Diamond APP", template_folder='template')
 
@@ -40,7 +44,10 @@ def predict():
     del out_row["table"]
     out_row["request_url"] = request.url
     out_row["response_json"] = json.dumps(out_data)
-    create_element(LogPredictions, out_row)
+    try:
+        create_element(LogPredictions, out_row)
+    except:
+        pass
     return jsonify({"message": "Price predicted successfully", "data": out_data})
 
 # /api/similarities?n=3&cut=Premium&color=E&clarity=SI1&carat=0.25
@@ -63,7 +70,11 @@ def similarities():
     out_row["carat"] = carat
     out_row["request_url"] = request.url
     out_row["response_json"] = json.dumps(out_data)
-    create_element(LogSimilarities, out_row)
+    try:
+        create_element(LogSimilarities, out_row)
+    except:
+        pass
+
     msg = "Similar diamonds found" if len(out_data) > 0 else "No similar diamonds found in the dataset."
     return jsonify({"message": msg, "data": out_data})
 
