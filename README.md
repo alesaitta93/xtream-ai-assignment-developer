@@ -76,3 +76,19 @@ Run the Python file main.py located in the /challenge/pipeline folder. Two model
 Run the Python file flask_app.py located in the /challenge/app folder. The console will display the URL where a simple HTML page will be accessible. By filling out two forms on this page, you can either predict the value of a diamond or obtain data on a number of similar diamonds (specified by the user) present in the training set. The selected prediction model is the one with the lowest MAE (Mean Absolute Error) score, according to the file /challenge/pipeline/models/models.csv.
 
 A reduced version of the app is also accessible at http://alelily93.eu.pythonanywhere.com/. This version is considered reduced because only linear regression models could be used on PythonAnywhere. Some functionalities of the project are not compatible with the version of XGBoost installed on the hosting platform.
+
+### Challenge 4
+Run the flask_app.py file located in the /challenge/app folder, after following these steps:
+
+Create a Database: Launch your MySQL/MariaDB database management console or client and run the diamonds_db_creation.sql script found in the /challenge/app/database folder. This will set up the necessary database.
+
+Configure Environment Variables: Create a .env file in the /challenge/app folder with the following content:
+
+DATABASE_URL = "database_address"
+DATABASE_USERNAME = "username"
+DATABASE_PASSWORD = "password"
+DATABASE_PORT = database_port_number
+DATABASE_DIAMONDS = "diamonds_db"
+Ensure that the DATABASE_DIAMONDS value matches the database name specified in the SQL script (diamonds_db).
+
+Note: The Flask application will function correctly even without the creation of the database. A message saying "No DB detected" will appear in the Pyhton console, and API requests and responses will not be saved.
